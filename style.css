@@ -240,7 +240,7 @@ rgba(0,0,0,0.12);
 #resetBtn{
 
 position:absolute;
-
+display:none;
 top:15px;
 
 right:15px;
