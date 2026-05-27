@@ -1,108 +1,197 @@
-const otpBox = document.getElementById("otpBox");
-const timerText = document.getElementById("timer");
-const startBtn = document.getElementById("startBtn");
-const submitBtn = document.getElementById("submitBtn");
-const answers = document.getElementById("answers");
-const result = document.getElementById("result");
-const inputSection = document.getElementById("inputSection");
+const otpBox =
+document.getElementById("otpBox");
 
-let otpList = [];
-let round = 0;
+const timerText =
+document.getElementById("timer");
+
+const startBtn =
+document.getElementById("startBtn");
+
+const stopBtn =
+document.getElementById("stopBtn");
+
+const submitBtn =
+document.getElementById("submitBtn");
+
+const answers =
+document.getElementById("answers");
+
+const result =
+document.getElementById("result");
+
+const inputSection =
+document.getElementById("inputSection");
+
+const otpHistory =
+document.getElementById("otpHistory");
+
+const historySection =
+document.getElementById("historySection");
 
 const TOTAL_OTPS = 10;
 const DISPLAY_TIME = 3;
 
-function generateOTP() {
-    return Math.floor(
-        100000 + Math.random() * 900000
-    ).toString();
-}
+let otpList = [];
+let round = 0;
 
-function showOTP() {
+let timerInterval;
+let running = false;
 
-    let otp = generateOTP();
+function generateOTP(){
 
-    otpList.push(otp);
-
-    otpBox.textContent = otp;
-
-    let timeLeft = DISPLAY_TIME;
-
-    timerText.textContent =
-    `Next OTP in: ${timeLeft}`;
-
-    let countdown = setInterval(() => {
-
-        timeLeft--;
-
-        timerText.textContent =
-        `Next OTP in: ${timeLeft}`;
-
-        if(timeLeft <= 0){
-
-            clearInterval(countdown);
-
-            round++;
-
-            if(round < TOTAL_OTPS){
-
-                showOTP();
-
-            } else {
-
-                otpBox.textContent =
-                "Finished";
-
-                timerText.textContent =
-                "Enter OTPs below";
-
-                inputSection.hidden = false;
-            }
-
-        }
-
-    },1000);
+return Math.floor(
+100000 + Math.random()*900000
+).toString();
 
 }
 
-startBtn.addEventListener("click",()=>{
+function finishGame(){
 
-    startBtn.disabled = true;
+running = false;
 
-    otpList = [];
-    round = 0;
+clearInterval(timerInterval);
 
-    result.textContent = "";
+otpBox.textContent =
+"Finished";
 
-    inputSection.hidden = true;
+timerText.textContent =
+"Enter OTPs";
 
-    answers.value = "";
+startBtn.disabled = false;
+stopBtn.disabled = true;
 
-    showOTP();
+inputSection.hidden = false;
+
+historySection.hidden = false;
+
+otpHistory.innerHTML =
+otpList.join("<br>");
+
+}
+
+function showOTP(){
+
+if(!running) return;
+
+const otp = generateOTP();
+
+otpList.push(otp);
+
+otpBox.textContent = otp;
+
+let timeLeft = DISPLAY_TIME;
+
+timerText.textContent =
+`Next OTP: ${timeLeft}s`;
+
+clearInterval(timerInterval);
+
+timerInterval =
+setInterval(()=>{
+
+timeLeft--;
+
+timerText.textContent =
+`Next OTP: ${timeLeft}s`;
+
+if(timeLeft<=0){
+
+clearInterval(
+timerInterval
+);
+
+round++;
+
+if(
+round >= TOTAL_OTPS
+){
+
+finishGame();
+
+}else{
+
+showOTP();
+
+}
+
+}
+
+},1000);
+
+}
+
+startBtn.addEventListener(
+"click",
+()=>{
+
+running=true;
+
+otpList=[];
+
+round=0;
+
+answers.value="";
+
+result.textContent="";
+
+historySection.hidden=true;
+
+inputSection.hidden=true;
+
+startBtn.disabled=true;
+
+stopBtn.disabled=false;
+
+showOTP();
 
 });
 
-submitBtn.addEventListener("click",()=>{
+stopBtn.addEventListener(
+"click",
+()=>{
 
-    let userInput =
-    answers.value
-    .trim()
-    .split("\n")
-    .map(x=>x.trim());
+finishGame();
 
-    let score = 0;
+});
 
-    for(let otp of otpList){
+submitBtn.addEventListener(
+"click",
+()=>{
 
-        if(userInput.includes(otp)){
-            score++;
-        }
+const entered =
+answers.value
+.trim()
+.split("\n")
+.map(x=>x.trim());
 
-    }
+let score=0;
 
-    result.innerHTML =
-    `Score: ${score}/${TOTAL_OTPS}<br>
-     Accuracy:
-     ${Math.round(score/TOTAL_OTPS*100)}%`;
+otpList.forEach(
+otp=>{
+
+if(
+entered.includes(otp)
+){
+
+score++;
+
+}
+
+});
+
+const accuracy =
+Math.round(
+(score/
+otpList.length)*100
+);
+
+result.innerHTML=
+`
+Correct:
+${score}/${otpList.length}
+<br>
+Accuracy:
+${accuracy}%
+`;
 
 });
