@@ -1,13 +1,34 @@
-const otpBox = document.getElementById("otpBox");
-const timerText = document.getElementById("timer");
-const resetBtn = document.getElementById("resetBtn");
-const startBtn = document.getElementById("startBtn");
-const stopBtn = document.getElementById("stopBtn");
-const submitBtn = document.getElementById("submitBtn");
+// =====================================
+// OTP Focus Challenge Game
+// Kids concentration training game
+// =====================================
 
-const answers = document.getElementById("answers");
 
-const result = document.getElementById("result");
+// ---------- UI ELEMENTS ----------
+
+const otpBox =
+document.getElementById("otpBox");
+
+const timerText =
+document.getElementById("timer");
+
+const resetBtn =
+document.getElementById("resetBtn");
+
+const startBtn =
+document.getElementById("startBtn");
+
+const stopBtn =
+document.getElementById("stopBtn");
+
+const submitBtn =
+document.getElementById("submitBtn");
+
+const answers =
+document.getElementById("answers");
+
+const result =
+document.getElementById("result");
 
 const inputSection =
 document.getElementById("inputSection");
@@ -18,57 +39,84 @@ document.getElementById("otpHistory");
 const historySection =
 document.getElementById("historySection");
 
+
+// ---------- GAME SETTINGS ----------
+
 const TOTAL_OTPS = 10;
 const DISPLAY_TIME = 3;
 
+
+// ---------- GAME STATE ----------
+
 let otpList = [];
+
 let round = 0;
 
 let timerInterval = null;
+
 let running = false;
 
-function generateOTP(){
+
+// Hide reset initially
+resetBtn.style.display = "none";
+
+
+
+// =====================================
+// OTP GENERATION
+// =====================================
+
+function generateOTP() {
 
 return Math.floor(
-100000 + Math.random()*900000
+100000 + Math.random() * 900000
 ).toString();
 
 }
 
-function finishGame(stopped=false){
 
-running = false;
 
-clearInterval(timerInterval);
+// =====================================
+// START GAME
+// =====================================
 
-timerInterval = null;
+function startGame() {
 
-otpBox.textContent =
-stopped ? "Stopped" : "Finished";
+running = true;
 
-timerText.textContent =
-"Enter OTPs below";
+otpList = [];
 
-startBtn.disabled = false;
-stopBtn.disabled = true;
+round = 0;
 
-inputSection.hidden = false;
+answers.value = "";
 
-historySection.hidden = false;
+result.textContent = "";
 
-otpHistory.innerHTML =
-otpList
-.map(
-otp =>
-`<div class="otpCard">
-${otp}
-</div>`
-)
-.join("");
+otpHistory.innerHTML = "";
 
-function showOTP(){
+historySection.hidden = true;
 
-if(!running) return;
+inputSection.hidden = true;
+
+resetBtn.style.display = "none";
+
+startBtn.disabled = true;
+
+stopBtn.disabled = false;
+
+showOTP();
+
+}
+
+
+
+// =====================================
+// DISPLAY OTP
+// =====================================
+
+function showOTP() {
+
+if (!running) return;
 
 const otp = generateOTP();
 
@@ -81,12 +129,12 @@ let seconds = DISPLAY_TIME;
 timerText.textContent =
 `Next OTP in ${seconds}s`;
 
+
 clearInterval(timerInterval);
 
-timerInterval =
-setInterval(()=>{
+timerInterval = setInterval(() => {
 
-if(!running){
+if (!running) {
 
 clearInterval(timerInterval);
 
@@ -99,19 +147,22 @@ seconds--;
 timerText.textContent =
 `Next OTP in ${seconds}s`;
 
-if(seconds <= 0){
+
+if (seconds <= 0) {
 
 clearInterval(timerInterval);
 
 round++;
 
-if(!running) return;
+if (!running) return;
 
-if(round >= TOTAL_OTPS){
+
+if (round >= TOTAL_OTPS) {
 
 finishGame();
 
-}else{
+}
+else {
 
 showOTP();
 
@@ -119,56 +170,99 @@ showOTP();
 
 }
 
-},1000);
+}, 1000);
 
 }
 
-startBtn.onclick = ()=>{
 
-running = true;
 
-otpList = [];
+// =====================================
+// FINISH GAME
+// =====================================
 
-round = 0;
+function finishGame(stopped = false) {
 
-answers.value = "";
+running = false;
 
-result.textContent = "";
+clearInterval(timerInterval);
 
-historySection.hidden = true;
+timerInterval = null;
 
-inputSection.hidden = true;
 
-startBtn.disabled = true;
+otpBox.textContent =
+stopped
+? "Stopped"
+: "Finished";
 
-stopBtn.disabled = false;
 
-showOTP();
+timerText.textContent =
+"Enter OTPs below";
 
-};
 
-stopBtn.onclick = ()=>{
+startBtn.disabled = false;
 
-finishGame(true);
+stopBtn.disabled = true;
 
-};
 
-submitBtn.onclick = ()=>{
+inputSection.hidden = false;
+
+historySection.hidden = false;
+
+
+showOTPHistory();
+
+resetBtn.style.display = "flex";
+
+}
+
+
+
+// =====================================
+// SHOW GENERATED OTPS
+// =====================================
+
+function showOTPHistory() {
+
+otpHistory.innerHTML =
+otpList
+.map(
+otp =>
+
+`<div class="otpCard">
+${otp}
+</div>`
+
+)
+.join("");
+
+}
+
+
+
+// =====================================
+// CALCULATE SCORE
+// =====================================
+
+function checkScore() {
 
 const entered =
 answers.value
 .trim()
 .split("\n")
-.map(x=>x.trim())
-.filter(x=>x);
+.map(
+x => x.trim()
+)
+.filter(Boolean);
+
 
 let score = 0;
 
-otpList.forEach(otp=>{
 
-if(
+otpList.forEach(otp => {
+
+if (
 entered.includes(otp)
-){
+) {
 
 score++;
 
@@ -176,58 +270,93 @@ score++;
 
 });
 
+
 const accuracy =
 otpList.length
-? Math.round(
-(score/otpList.length)*100
+?
+Math.round(
+(score / otpList.length)
+* 100
 )
-:0;
+: 0;
+
 
 result.innerHTML =
+
 `
-Score:
+🏆 Score:
 ${score}/${otpList.length}
+
 <br>
-Accuracy:
+
+🎯 Accuracy:
 ${accuracy}%
 `;
 
-};
+}
 
-  function resetGame(){
 
-running=false;
+
+// =====================================
+// RESET GAME
+// =====================================
+
+function resetGame() {
+
+running = false;
 
 clearInterval(timerInterval);
 
-timerInterval=null;
+timerInterval = null;
 
-otpList=[];
 
-round=0;
+otpList = [];
 
-otpBox.textContent="------";
+round = 0;
 
-timerText.textContent=
+
+otpBox.textContent =
+"------";
+
+timerText.textContent =
 "Press Start";
 
-answers.value="";
 
-result.textContent="";
+answers.value = "";
 
-otpHistory.innerHTML="";
+result.textContent = "";
 
-historySection.hidden=true;
+otpHistory.innerHTML = "";
 
-inputSection.hidden=true;
 
-startBtn.disabled=false;
+historySection.hidden = true;
 
-stopBtn.disabled=true;
+inputSection.hidden = true;
+
+
+startBtn.disabled = false;
+
+stopBtn.disabled = true;
+
+
+resetBtn.style.display = "none";
 
 }
-  resetBtn.onclick=()=>{
 
-resetGame();
 
-};
+
+// =====================================
+// BUTTON EVENTS
+// =====================================
+
+startBtn.onclick =
+startGame;
+
+stopBtn.onclick =
+() => finishGame(true);
+
+submitBtn.onclick =
+checkScore;
+
+resetBtn.onclick =
+resetGame;
