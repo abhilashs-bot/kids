@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Focus OTP Challenge</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎯 Focus OTP Challenge</h1>
+
+    <p>Watch the OTPs carefully and write them down.</p>
+
+    <div id="otpBox">------</div>
+
+    <div id="timer">Next OTP in: 3</div>
+
+    <button id="startBtn">Start Game</button>
+
+    <div id="inputSection" hidden>
+        <h3>Enter OTPs you noted down</h3>
+
+        <textarea
+        id="answers"
+        rows="10"
+        placeholder="Enter one OTP per line"></textarea>
+
+        <button id="submitBtn">Check Score</button>
+    </div>
+
+    <div id="result"></div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
