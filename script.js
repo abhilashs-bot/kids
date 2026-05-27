@@ -1,6 +1,6 @@
 const otpBox = document.getElementById("otpBox");
 const timerText = document.getElementById("timer");
-
+const resetBtn = document.getElementById("resetBtn");
 const startBtn = document.getElementById("startBtn");
 const stopBtn = document.getElementById("stopBtn");
 const submitBtn = document.getElementById("submitBtn");
@@ -191,5 +191,43 @@ ${score}/${otpList.length}
 Accuracy:
 ${accuracy}%
 `;
+
+};
+
+  function resetGame(){
+
+running=false;
+
+clearInterval(timerInterval);
+
+timerInterval=null;
+
+otpList=[];
+
+round=0;
+
+otpBox.textContent="------";
+
+timerText.textContent=
+"Press Start";
+
+answers.value="";
+
+result.textContent="";
+
+otpHistory.innerHTML="";
+
+historySection.hidden=true;
+
+inputSection.hidden=true;
+
+startBtn.disabled=false;
+
+stopBtn.disabled=true;
+
+}
+  resetBtn.onclick=()=>{
+
+resetGame();
 
 };
