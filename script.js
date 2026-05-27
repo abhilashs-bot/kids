@@ -57,9 +57,14 @@ inputSection.hidden = false;
 historySection.hidden = false;
 
 otpHistory.innerHTML =
-otpList.join("<br>");
-
-}
+otpList
+.map(
+otp =>
+`<div class="otpCard">
+${otp}
+</div>`
+)
+.join("");
 
 function showOTP(){
 
