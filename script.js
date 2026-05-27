@@ -1,23 +1,13 @@
-const otpBox =
-document.getElementById("otpBox");
+const otpBox = document.getElementById("otpBox");
+const timerText = document.getElementById("timer");
 
-const timerText =
-document.getElementById("timer");
+const startBtn = document.getElementById("startBtn");
+const stopBtn = document.getElementById("stopBtn");
+const submitBtn = document.getElementById("submitBtn");
 
-const startBtn =
-document.getElementById("startBtn");
+const answers = document.getElementById("answers");
 
-const stopBtn =
-document.getElementById("stopBtn");
-
-const submitBtn =
-document.getElementById("submitBtn");
-
-const answers =
-document.getElementById("answers");
-
-const result =
-document.getElementById("result");
+const result = document.getElementById("result");
 
 const inputSection =
 document.getElementById("inputSection");
@@ -34,7 +24,7 @@ const DISPLAY_TIME = 3;
 let otpList = [];
 let round = 0;
 
-let timerInterval;
+let timerInterval = null;
 let running = false;
 
 function generateOTP(){
@@ -45,17 +35,19 @@ return Math.floor(
 
 }
 
-function finishGame(){
+function finishGame(stopped=false){
 
 running = false;
 
 clearInterval(timerInterval);
 
+timerInterval = null;
+
 otpBox.textContent =
-"Finished";
+stopped ? "Stopped" : "Finished";
 
 timerText.textContent =
-"Enter OTPs";
+"Enter OTPs below";
 
 startBtn.disabled = false;
 stopBtn.disabled = true;
@@ -79,32 +71,38 @@ otpList.push(otp);
 
 otpBox.textContent = otp;
 
-let timeLeft = DISPLAY_TIME;
+let seconds = DISPLAY_TIME;
 
 timerText.textContent =
-`Next OTP: ${timeLeft}s`;
+`Next OTP in ${seconds}s`;
 
 clearInterval(timerInterval);
 
 timerInterval =
 setInterval(()=>{
 
-timeLeft--;
+if(!running){
+
+clearInterval(timerInterval);
+
+return;
+
+}
+
+seconds--;
 
 timerText.textContent =
-`Next OTP: ${timeLeft}s`;
+`Next OTP in ${seconds}s`;
 
-if(timeLeft<=0){
+if(seconds <= 0){
 
-clearInterval(
-timerInterval
-);
+clearInterval(timerInterval);
 
 round++;
 
-if(
-round >= TOTAL_OTPS
-){
+if(!running) return;
+
+if(round >= TOTAL_OTPS){
 
 finishGame();
 
@@ -120,54 +118,48 @@ showOTP();
 
 }
 
-startBtn.addEventListener(
-"click",
-()=>{
+startBtn.onclick = ()=>{
 
-running=true;
+running = true;
 
-otpList=[];
+otpList = [];
 
-round=0;
+round = 0;
 
-answers.value="";
+answers.value = "";
 
-result.textContent="";
+result.textContent = "";
 
-historySection.hidden=true;
+historySection.hidden = true;
 
-inputSection.hidden=true;
+inputSection.hidden = true;
 
-startBtn.disabled=true;
+startBtn.disabled = true;
 
-stopBtn.disabled=false;
+stopBtn.disabled = false;
 
 showOTP();
 
-});
+};
 
-stopBtn.addEventListener(
-"click",
-()=>{
+stopBtn.onclick = ()=>{
 
-finishGame();
+finishGame(true);
 
-});
+};
 
-submitBtn.addEventListener(
-"click",
-()=>{
+submitBtn.onclick = ()=>{
 
 const entered =
 answers.value
 .trim()
 .split("\n")
-.map(x=>x.trim());
+.map(x=>x.trim())
+.filter(x=>x);
 
-let score=0;
+let score = 0;
 
-otpList.forEach(
-otp=>{
+otpList.forEach(otp=>{
 
 if(
 entered.includes(otp)
@@ -180,18 +172,19 @@ score++;
 });
 
 const accuracy =
-Math.round(
-(score/
-otpList.length)*100
-);
+otpList.length
+? Math.round(
+(score/otpList.length)*100
+)
+:0;
 
-result.innerHTML=
+result.innerHTML =
 `
-Correct:
+Score:
 ${score}/${otpList.length}
 <br>
 Accuracy:
 ${accuracy}%
 `;
 
-});
+};
